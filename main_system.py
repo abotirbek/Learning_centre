@@ -1,5 +1,3 @@
-from email.policy import default
-
 from course import (insert_course, get_all_course, get_course_empty_seats, get_course_debtors, get_course_payment,
                     count_course_student, get_all_course_student, get_group_course_student)
 from student_group import (insert_group, get_all_group, get_avg_group_age, get_group_payment, count_group_student,
