@@ -91,3 +91,40 @@ def create_group_statistics():
     finally:
         cursor.close()
         connection.close()
+
+
+def check_group_capacity():
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute('''
+    create or replace function check_group_capacity()
+    returns trigger as $$
+    declare
+        current_count int;
+        max_allowed int;
+    begin
+        select max_students
+        into max_allowed
+        from student_group
+        where id = new.group_id;
+    
+        select count(*)
+        into current_count
+        from student
+        where group_id = new.group_id;
+    
+        if current_count > max_allowed then
+            raise exception 'NO AVAILABLE SPACE LEFT';
+        end if;
+    
+        return new;
+    end; $$ language plpgsql;''')
+    connection.commit()
+    cursor.execute('''
+    create or replace trigger trg_check_group_capacity
+    before insert or update on student
+    for each row
+    execute function check_group_capacity();''')
+    connection.commit()
+    cursor.close()
+    connection.close()

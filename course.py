@@ -88,3 +88,37 @@ def get_group_course_student():
     data = cursor.fetchall()
     for d in data:
         print(d[0], d[1], d[2])
+
+def check_course_price():
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute('''
+    create or replace function check_course_price()
+    returns trigger as $$
+        declare
+            course_price numeric;
+        begin
+            select c.price
+            into course_price
+            from student_group sg
+            inner join course c on c.id = sg.course_id
+            where sg.id = new.group_id;
+    
+            if course_price is null then
+                raise exception 'Student group not found or course price is null!';
+            end if;
+    
+            if new.paid_amount > course_price then
+                raise exception 'Fee must NOT exceed course price!';
+            end if;
+            return new;
+        end; $$ language plpgsql;''')
+    connection.commit()
+    cursor.execute('''
+    create or replace trigger trg_check_course_price
+    before insert or update on student
+    for each row
+    execute function check_course_price();''')
+    connection.commit()
+    cursor.close()
+    connection.close()

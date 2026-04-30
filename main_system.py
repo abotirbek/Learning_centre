@@ -1,15 +1,15 @@
-from email.policy import default
-
 from course import (insert_course, get_all_course, get_course_empty_seats, get_course_debtors, get_course_payment,
-                    count_course_student, get_all_course_student, get_group_course_student)
+                    count_course_student, get_all_course_student, get_group_course_student, check_course_price)
 from student_group import (insert_group, get_all_group, get_avg_group_age, get_group_payment, count_group_student,
-                           get_all_group_student, create_group_statistics, get_group_student)
+                           get_all_group_student, create_group_statistics, get_group_student, check_group_capacity)
 from student import (insert_student, get_all_student, get_active_student, get_inactive_student, get_female_student,
                      get_male_student, get_student_over_18, get_unpaid_student, get_student_by_phone, get_student_payment_info,
                      get_student_in_debt,  get_student_without_debt, count_student, count_in_active_student, count_male_female,
                      get_highest_student_payment, get_most_indebted_student, create_student_full_info)
 
 def start_project():
+    check_course_price()
+    check_group_capacity()
     while True:
         choice = int(input('''
 ------------------------------------------------------------
